@@ -15,4 +15,10 @@ public class Markup {
 		this.inside = inside;
 		this.father = null;
 	}
+	public String getName() {
+		return this.name;
+		}
+	public String getText() {
+		return this.inside;
+	}
 }

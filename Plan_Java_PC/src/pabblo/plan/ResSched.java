@@ -11,13 +11,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import pabblo.parseMarkup.Markup;
 import pabblo.parseMarkup.MarkupSys;
 
 public class ResSched {
 	private static String passwd_admin = "87a9sd4c2H8y1f2c89fD57sD78h23d8F2HJ";
-	ArrayList<Plan> plany;
-	ArrayList<Przedmiot> przedmioty;
+	private ArrayList<Plan> plany;
+	private ArrayList<Przedmiot> przedmioty;
+	
 	public ResSched() {
+		przedmioty = new ArrayList<Przedmiot>();
+		plany = new ArrayList<Plan>();
 		long start = System.currentTimeMillis();
 		downloadSubjectsList();
 		System.out.println("\n"+(System.currentTimeMillis()-start)+"ms");
@@ -55,6 +59,7 @@ public class ResSched {
 	        	throw new Exception("Nie pobrano listy przedmiotów.\nKod b³êdu: "+response);
 	        //System.out.println(response);
 	        MarkupSys as = new MarkupSys(response);
+	        addPrzedmiotyOnline(as);
 		}
 		catch (IOException e){
 			System.out.println("B³¹d po³¹czenia...");
@@ -65,6 +70,33 @@ public class ResSched {
 		
 	}
 	
+	private void addPrzedmiotyOnline(MarkupSys as) {
+		przedmioty.clear();
+		int id=0;
+		String name="";
+		String skrot="";
+		int typ=0;
+		String kolor="";
+		while(as.isNext()){
+			Markup temp = as.getNextMarkup();
+			
+			
+			if(temp.getName().matches("id"))
+				id = Integer.valueOf(temp.getText());
+			if(temp.getName().matches("nazwa"))
+				name = temp.getText();
+			if(temp.getName().matches("skrot"))
+				skrot = temp.getText();
+			if(temp.getName().matches("typ"))
+				typ = Integer.valueOf(temp.getText());
+			if(temp.getName().matches("kolor"))
+				kolor = temp.getText();
+			if(temp.getName().matches("przedmiot_end"))
+				przedmioty.add(new Przedmiot(id,name,skrot,typ,kolor));
+		}
+		
+		
+	}
 	void nowyPrzedmiot(String nazwa, String skrot, int typ){
 		nowyPrzedmiot(nazwa, skrot, typ, 588464);
 	}
@@ -109,5 +141,8 @@ public class ResSched {
 		catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+	}
+	public ArrayList<Przedmiot> getPrzedmioty() {
+		return przedmioty;
 	}
 }
